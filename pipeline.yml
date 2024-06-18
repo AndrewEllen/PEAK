@@ -1,0 +1,28 @@
+image: cirrusci/flutter
+
+pipelines:
+  default:
+    - step:
+        name: Build and Test
+        caches:
+          - flutter
+        script:
+          - echo "Starting the build and test process..."
+          - flutter pub get
+          - flutter test
+          - echo "Build and test completed successfully."
+
+  branches:
+    master:
+      - step:
+          name: Lint and Test on Master
+          caches:
+            - flutter
+          script:
+            - echo "Running linting and testing on the master branch..."
+            - flutter pub get
+            - flutter format .
+            - git diff --exit-code || (echo "Linting issues found. Please run 'flutter format .' and commit the changes." && exit 1)
+            - flutter analyze --no-pub --no-current-package lib test
+            - flutter test
+            - echo "Linting and testing completed on the master branch."
